@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: booking-platform-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: booking_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - booking_postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: booking-platform-api
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/booking_platform
+      JWT_SECRET: booking-platform-local-secret-change-later
+    ports:
+      - "3000:3000"
+
+volumes:
+  booking_postgres_data:
